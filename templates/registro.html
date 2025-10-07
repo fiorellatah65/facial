@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+<h2>✍️ Registro de Usuario</h2>
+
+<form method="POST" id="form-registro">
+    <div class="form-group">
+        <label>👤 Usuario *</label>
+        <input type="text" name="usuario" id="usuario" required 
+               placeholder="Elige un nombre de usuario" minlength="3">
+    </div>
+
+    <div class="form-group">
+        <label>🔒 Contraseña *</label>
+        <input type="password" name="contra" id="contra" required 
+               placeholder="Mínimo 4 caracteres" minlength="4">
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        ✅ Crear Usuario
+    </button>
+</form>
+
+{% if mostrar_facial %}
+<div class="divider">
+    <span>Paso 2: Registro Facial (Opcional)</span>
+</div>
+
+<p style="text-align: center; color: #666; margin-bottom: 1rem;">
+    Captura tu rostro para poder usar login facial
+</p>
+
+<button class="btn btn-facial" onclick="iniciarRegistroFacial()">
+    📸 Activar Cámara
+</button>
+
+<div id="video-container">
+    <video id="video" autoplay playsinline></video>
+    <div class="video-controls">
+        <button type="button" class="btn btn-primary" onclick="capturarFoto()">
+            ✅ Capturar Rostro
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="cancelarCaptura()">
+            ❌ Cancelar
+        </button>
+    </div>
+</div>
+
+<button type="button" class="btn btn-secondary" onclick="omitirFacial()" 
+        style="margin-top: 1rem;">
+    ⏩ Omitir y continuar sin registro facial
+</button>
+{% endif %}
+
+<div class="text-center" style="margin-top: 1.5rem;">
+    <a href="{{ url_for('login') }}" class="link">
+        ¿Ya tienes cuenta? Inicia sesión
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let stream = null;
+const video = document.getElementById('video');
+
+async function iniciarRegistroFacial() {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                width: { ideal: 640 }, 
+                height: { ideal: 480 },
+                facingMode: 'user'
+            } 
+        });
+        video.srcObject = stream;
+        document.getElementById('video-container').style.display = 'block';
+    } catch (error) {
+        alert('❌ Error al acceder a la cámara: ' + error.message);
+        console.error(error);
+    }
+}
+
+function capturarFoto() {
+    if (!video.videoWidth || !video.videoHeight) {
+        alert('⚠️ Espera a que la cámara se active completamente');
+        return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    
+    const imagenBase64 = canvas.toDataURL('image/jpeg', 0.8);
+    
+    // Enviar al servidor
+    fetch('/capturar_registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imagen: imagenBase64 })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ ' + data.mensaje);
+            window.location.href = '/login';
+        } else {
+            alert('❌ ' + data.error);
+        }
+        cancelarCaptura();
+    })
+    .catch(error => {
+        alert('❌ Error de conexión: ' + error);
+        cancelarCaptura();
+    });
+}
+
+function cancelarCaptura() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+    document.getElementById('video-container').style.display = 'none';
+}
+
+function omitirFacial() {
+    fetch('/omitir_facial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('✅ ' + data.mensaje);
+        window.location.href = '/login';
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    });
+}
+</script>
+{% endblock %}

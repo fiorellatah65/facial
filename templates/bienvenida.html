@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Bienvenido{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+    <h2 style="color: #28a745;">✅ ¡Bienvenido!</h2>
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                color: white; padding: 2rem; border-radius: 15px; margin: 2rem 0;">
+        <h3 style="margin: 0; font-size: 2rem;">{{ usuario }}</h3>
+        <p style="margin-top: 0.5rem; opacity: 0.9;">Has iniciado sesión exitosamente</p>
+    </div>
+
+    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin: 1.5rem 0;">
+        <h4 style="color: #667eea; margin-bottom: 1rem;">📊 Panel de Usuario</h4>
+        <div style="display: grid; gap: 1rem;">
+            <button class="btn btn-secondary">👤 Mi Perfil</button>
+            <button class="btn btn-secondary">⚙️ Configuración</button>
+            <button class="btn btn-secondary">❓ Ayuda</button>
+        </div>
+    </div>
+
+    <a href="{{ url_for('logout') }}" style="text-decoration: none;">
+        <button class="btn btn-primary" style="background: #dc3545;">
+            🚪 Cerrar Sesión
+        </button>
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Login Inteligente{% endblock %}
+
+{% block content %}
+<h2>🏠 Bienvenido</h2>
+<p style="text-align: center; color: #666; margin-bottom: 1rem;">
+    Sistema de autenticación con reconocimiento facial
+</p>
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem; text-align: center;">
+    <h3 style="margin: 0; font-size: 2.5rem;">{{ total_usuarios }}</h3>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+        {% if total_usuarios == 0 %}
+            usuarios registrados
+        {% elif total_usuarios == 1 %}
+            usuario registrado
+        {% else %}
+            usuarios registrados
+        {% endif %}
+    </p>
+</div>
+
+<a href="{{ url_for('login') }}" style="text-decoration: none;">
+    <button class="btn btn-primary">
+        🔑 Iniciar Sesión
+    </button>
+</a>
+
+<a href="{{ url_for('registro') }}" style="text-decoration: none;">
+    <button class="btn btn-secondary">
+        ✍️ Registrarse
+    </button>
+</a>
+
+<div style="margin-top: 2rem; text-align: center;">
+    <a href="{{ url_for('ver_usuarios') }}" class="link">
+        📋 Ver usuarios registrados
+    </a>
+</div>
+
+<div style="margin-top: 1rem; text-align: center; color: #999; font-size: 0.9rem;">
+    <p>💡 Puedes usar login tradicional o facial</p>
+    <p>🔒 Soporta múltiples usuarios simultáneamente</p>
+</div>
+{% endblock %}
